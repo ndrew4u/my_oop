@@ -35,3 +35,7 @@ out/
 CMakeFiles/
 CMakeCache.txt
 cmake_install.cmake
+
+# C# / .NET
+**/bin/
+**/obj/
