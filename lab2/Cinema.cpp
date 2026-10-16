@@ -15,7 +15,7 @@ Cinema::~Cinema()
 {
 	std::cout << "*Киноеатр удален*\n";
 }
-void Cinema::SetFilmToHall(Film& film)
+void Cinema::SetFilmToHall(std::shared_ptr<Film>& film)
 {
 	m_hall.SetFilm(film);
 }
