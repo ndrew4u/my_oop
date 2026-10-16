@@ -3,16 +3,16 @@ namespace lab3_csahrp
 {
     internal class Hall
     {
-        private int number;
-        private int seats;
-        private Film? film;
-        private bool isFilmStarted;
+        private int _number;
+        private int _seats;
+        private Film? _film;
+        private bool _isFilmStarted;
         public Hall()
         {
-            number = 0;
-            seats = 0;
-            film = null;
-            isFilmStarted = false;
+            _number = 0;
+            _seats = 0;
+            _film = null;
+            _isFilmStarted = false;
             Console.WriteLine("Зал создан!\n");
         }
         public Hall(int newNumber, int newSeats)
@@ -20,75 +20,100 @@ namespace lab3_csahrp
             if (newNumber <= 0)
             {
                 Console.WriteLine("Ошибка! Номер зала должен быть больше нуля!\n");
-                number = 0;
+                _number = 0;
             }
             else
             {
-                number = newNumber;
+                _number = newNumber;
             }
-
             if (newSeats <= 0)
             {
                 Console.WriteLine("Ошибка! Количество мест должно быть больше нуля!\n");
-                seats = 0;
+                _seats = 0;
             }
             else
             {
-                seats = newSeats;
+                _seats = newSeats;
             }
-            film = null;
-            isFilmStarted = false;
+            _film = null;
+            _isFilmStarted = false;
             Console.WriteLine("Зал создан!\n");
         }
-        public void SetFilm(Film newfilm)
+        public void SetFilm(Film newFilm)
         {
-            if (isFilmStarted == true) { Console.WriteLine("Ошибка! Нельзя изменить фильм во время показа!\n"); }
-            else { film = newfilm; Console.WriteLine("Фильм назначен в зал!\n"); }
+            if (_isFilmStarted == true)
+            {
+                Console.WriteLine("Ошибка! Нельзя изменить фильм во время показа!\n");
+            }
+            else
+            {
+                _film = newFilm;
+                Console.WriteLine("Фильм назначен в зал!\n");
+            }
         }
         public void StartFilm()
         {
-            if (film == null)
+            if (_film == null)
             {
                 Console.WriteLine("Ошибка! Фильм не назначен!\n");
             }
-            else if (isFilmStarted == true)
+            else if (_isFilmStarted == true)
             {
                 Console.WriteLine("Ошибка! Фильм уже идёт!\n");
             }
             else
             {
-                isFilmStarted = true;
+                _isFilmStarted = true;
                 Console.WriteLine("Фильм запущен!\n");
             }
         }
         public void StopFilm()
         {
-            if (isFilmStarted == false) { Console.WriteLine("Ошибка! Фильм уже остановлен!\n"); }
-            else { isFilmStarted = false; Console.WriteLine("Фильм остановлен!\n"); }
+            if (_isFilmStarted == false)
+            {
+                Console.WriteLine("Ошибка! Фильм уже остановлен!\n");
+            }
+            else
+            {
+                _isFilmStarted = false;
+                Console.WriteLine("Фильм остановлен!\n");
+            }
         }
         public void PrintInfo()
         {
-            Console.WriteLine($"Номер зала: {number}\n");
-            Console.WriteLine($"Кол-во мест: {seats}\n");
-            if (film != null) { Console.WriteLine($"Фильм: {film.Name}\n"); }
-            else { Console.WriteLine("Фильм не назначен!\n"); }
+            Console.WriteLine($"Номер зала: {_number}\n");
+            Console.WriteLine($"Кол-во мест: {_seats}\n");
+            if (_film != null)
+            {
+                Console.WriteLine($"Фильм: {_film.Name}\n");
+            }
+            else
+            {
+                Console.WriteLine("Фильм не назначен!\n");
+            }
             Console.WriteLine("Состояние показа: ");
-            if (isFilmStarted == true) { Console.WriteLine("Идет\n"); }
-            else { Console.WriteLine("Не идет\n"); }
+            if (_isFilmStarted == true)
+            {
+                Console.WriteLine("Идет\n");
+            }
+            else
+            {
+                Console.WriteLine("Не идет\n");
+            }
         }
         public override string ToString()
         {
             string filmName;
-            if (film == null)
+            if (_film == null)
             {
                 filmName = "Не назначен";
             }
             else
             {
-                filmName = film.Name;
+                filmName = _film.Name;
             }
             string status;
-            if (isFilmStarted)
+            if (_isFilmStarted)
             {
                 status = "Идёт";
             }
@@ -96,7 +121,7 @@ namespace lab3_csahrp
             {
                 status = "Не идёт";
             }
-            return $"Номер зала: {number}\n Количество мест: {seats}\n Фильм: {filmName}\n Состояние показа: {status}";
+            return $"Номер зала: {_number}\n Количество мест: {_seats}\n Фильм: {filmName}\n Состояние показа: {status}";
         }
     }
 }

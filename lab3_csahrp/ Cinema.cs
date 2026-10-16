@@ -3,40 +3,40 @@ namespace lab3_csahrp
 {
     internal class Cinema
     {
-        private string name;
-        private Hall hall;
+        private string _name;
+        private Hall _hall;
         public Cinema()
         {
-            name = "";
-            hall = new Hall();
+            _name = "";
+            _hall = new Hall();
             Console.WriteLine("Кинотеатр создан!\n");
         }
         public Cinema(string newName, int newNumber, int newSeats)
         {
-            name = newName;
-            hall = new Hall(newNumber, newSeats);
+            _name = newName;
+            _hall = new Hall(newNumber, newSeats);
             Console.WriteLine("Кинотеатр создан!\n");
         }
         public void SetFilmToHall(Film newFilm)
         {
-            hall.SetFilm(newFilm);
+            _hall.SetFilm(newFilm);
         }
         public void StartFilm()
         {
-            hall.StartFilm();
+            _hall.StartFilm();
         }
         public void StopFilm()
         {
-            hall.StopFilm();
+            _hall.StopFilm();
         }
         public void PrintInfo()
         {
-            Console.WriteLine($"Название кинотеатра: {name}\n");
-            hall.PrintInfo();
+            Console.WriteLine($"Название кинотеатра: {_name}\n");
+            _hall.PrintInfo();
         }
         public override string ToString()
         {
-            return $"Название кинотеатра: {name}\n" + hall.ToString();
+            return $"Название кинотеатра: {_name}\n" + _hall.ToString();
         }
     }
 }
