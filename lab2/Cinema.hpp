@@ -1,6 +1,7 @@
 ﻿#pragma once
 #include "hall.hpp"
 #include<string>
+#include <memory>
 class Cinema
 {
 private:
@@ -10,7 +11,7 @@ public:
 	Cinema();
 	Cinema(std::string name, int hallNumber, int seats);
 	~Cinema();
-	void SetFilmToHall(Film& film);
+	void SetFilmToHall(std::shared_ptr<Film>& film);
 	void StartFilm();
 	void StopFilm();
 	void PrintInfo();
