@@ -1,7 +1,7 @@
 ﻿#include "Hall.hpp"
 #include<iostream>
 Hall::Hall()
-    : m_number{ 0 }, m_seats{ 0 }, m_film{ nullptr }, m_isFilmStarted{ false }
+    : m_number{ 0 }, m_seats{ 0 }, m_film{}, m_isFilmStarted{false}
 {
     std::cout << "Кинозал создан\n";
 }
@@ -18,7 +18,7 @@ Hall::Hall(int number, int seats)
         m_number = number;
         m_seats = seats;
     }
-    m_film = nullptr;
+    m_film.reset();
     m_isFilmStarted = false;
     std::cout << "*Зал создан*\n";
 }
@@ -26,20 +26,19 @@ Hall::~Hall()
 {
     std::cout << "*Зал удален*\n";
 }
-void Hall::SetFilm(Film& film)
+void Hall::SetFilm(std::shared_ptr<Film>& film)
 {
-    m_film = &film;
+    m_film = film;
     std::cout << "Фильм назначен залу.\n";
 }
 void Hall::StartFilm()
 {
-    if (m_film == nullptr)
+    if (std::shared_ptr<Film> film = m_film.lock())
     {
-        std::cout << "Ошибка! Фильм не назначен.\n";
-        return;
+        m_isFilmStarted = true;
+        std::cout << "Фильм запущен.\n";
     }
-    m_isFilmStarted = true;
-    std::cout << "Фильм запущен.\n";
+    else { std::cout << "Фильм не назначен залу.\n"; return; }
 }
 void Hall::StopFilm()
 {
@@ -57,10 +56,10 @@ void Hall::PrintInfo()
 {
     std::cout << "Номер зала: " << m_number << "\n";
     std::cout << "Количество мест: " << m_seats << "\n";
-    if (m_film != nullptr)
+    if (std::shared_ptr<Film> film = m_film.lock())
     {
         std::cout << "Фильм в зале:\n";
-        m_film->PrintInfo();
+        film->PrintInfo();
     }
     else
     {
