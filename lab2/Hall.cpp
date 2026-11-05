@@ -1,7 +1,6 @@
 ﻿#include "Hall.hpp"
-#include<iostream>
+#include <iostream>
 Hall::Hall()
-    : m_number{ 0 }, m_seats{ 0 }, m_film{}, m_isFilmStarted{false}
 {
     std::cout << "Кинозал создан\n";
 }
@@ -9,17 +8,13 @@ Hall::Hall(int number, int seats)
 {
     if (number <= 0 || seats <= 0)
     {
-        std::cout << "Номер зала и количество сидений должны быть больше 0!\n";
-        m_number = 0;
-        m_seats = 0;
+        std::cout << "Номер зала и количество мест должны быть больше 0!\n";
     }
     else
     {
         m_number = number;
         m_seats = seats;
     }
-    m_film.reset();
-    m_isFilmStarted = false;
     std::cout << "*Зал создан*\n";
 }
 Hall::~Hall()
@@ -33,16 +28,19 @@ void Hall::SetFilm(std::shared_ptr<Film>& film)
 }
 void Hall::StartFilm()
 {
-    if (std::shared_ptr<Film> film = m_film.lock())
+    if (m_film.lock())
     {
         m_isFilmStarted = true;
         std::cout << "Фильм запущен.\n";
     }
-    else { std::cout << "Фильм не назначен залу.\n"; return; }
+    else
+    {
+        std::cout << "Фильм не назначен залу.\n";
+    }
 }
 void Hall::StopFilm()
 {
-    if (m_isFilmStarted == false)
+    if (!m_isFilmStarted)
     {
         std::cout << "Фильм уже остановлен.\n";
     }

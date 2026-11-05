@@ -1,89 +1,45 @@
-﻿#include "Cinema.hpp"
-#include "film.hpp"
-#include "hall.hpp"
-#include<iostream>
-#include<locale.h>
-#include<memory>
+﻿#include <iostream>
+#include <memory>
+#include <string>
+#include <utility>
+#include <locale.h>
+#include "BaseProduct.hpp"
+#include "Popcorn.hpp"
+#include "Drink.hpp"
+#include "Combo.hpp"
 int main()
 {
     setlocale(LC_ALL, "RUS");
+    Popcorn p1;
+    Popcorn p2("Сладкий", 250);
+    Popcorn p3 = p2;
+    Popcorn p4 = std::move(p3);
+    auto popcorn = std::make_shared<Popcorn>("Сладкий", 250);
+    auto drink = std::make_shared<Drink>("Кола", 150);
+    Combo combo1(popcorn, drink, 50);
+    auto combo2 = combo1.ShallowCopy();
+    Combo combo3 = combo1;
+    popcorn->SetPrice(300);
+    std::cout << "Исходное комбо: "
+        << combo1.GetPrice() << "\n";
+    std::cout << "Поверхностная копия: "
+        << combo2->GetPrice() << "\n";
+    std::cout << "Глубокая копия: "
+        << combo3.GetPrice() << "\n";
+    combo1 = combo1;
+    combo1.CopyTo(combo3);
+    std::unique_ptr<BaseProduct> products[2];
+    products[0] = std::make_unique<Popcorn>("Сладкий", 250);
+    products[1] = std::make_unique<Drink>("Кола", 150);
+    for (int i = 0; i < 2; i++)
     {
-        std::cout << "Передача владения:\n";
-        std::unique_ptr<Film> film = std::make_unique<Film>("Начало", 148, 12);
-        std::cout << "До передачи:\n";
-        film->PrintInfo();
-        std::unique_ptr<Film> film2 = std::move(film);
-        if (film == nullptr)
-        {
-            std::cout << "film пуст после передачи!\n";
-        }
-        if (film2 != nullptr)
-        {
-            std::cout << "film2 получил владение!\n";
-            film2->PrintInfo();
-        }
-        film2.reset();
+        std::cout << products[i]->Describe() << "\n";
     }
-    {
-        std::shared_ptr<Film> film = std::make_shared<Film>("Интерстеллар", 169, 12);
-        Cinema cinema("Кинотеатр", 1, 100);
-        cinema.SetFilmToHall(film);
-        std::cout << "\nДо удаления фильма:\n";
-        cinema.StartFilm();
-        cinema.StopFilm();
-        film.reset();
-        std::cout << "\nПосле удаления фильма:\n";
-        cinema.StartFilm();
-        cinema.PrintInfo();
-    }
-    std::cout << "\nУмный указатель unique_ptr:\n";
-    {
-        std::unique_ptr<Film> dynamicFilm = std::make_unique<Film>("Матрица", 136, 16);
-        dynamicFilm->PrintInfo();
-    }
-    std::cout << "Вышли из блока unique_ptr\n";
-    std::cout << "\nУмный указатель shared_ptr:\n";
-    std::shared_ptr<Film> film1 = std::make_shared<Film>("Дюна", 155, 12);
-    std::cout << "Владельцев: " << film1.use_count() << "\n";
-    {
-        std::shared_ptr<Film> film2 = film1;
-        std::cout << "Владельцев: " << film1.use_count() << "\n";
-        film2->PrintInfo();
-    }
-    std::cout << "Владельцев: " << film1.use_count() << "\n";
-    std::cout << "\nУмный указатель weak_ptr:\n";
-    std::weak_ptr<Film> ukaz;
-    {
-        std::shared_ptr<Film> film1 = std::make_shared<Film>("Начало", 148, 12);
-        ukaz = film1;
-        std::cout << "Владельцев: " << film1.use_count() << "\n";
-        if (std::shared_ptr<Film> temp = ukaz.lock())
-        {
-            std::cout << "Фильм существует!\n";
-            temp->PrintInfo();
-        }
-    }
-    std::cout << "Вышли из блока\n";
-    if (std::shared_ptr<Film> temp = ukaz.lock())
-    {
-        std::cout << "Фильм существует!\n";
-    }
-    else
-    {
-        std::cout << "Фильм уже уничтожен!\n";
-    }
-    std::cout << "\nДинамический массив объектов:\n";
-    {
-        std::unique_ptr<Film[]> filmArray = std::make_unique<Film[]>(2);
-        filmArray[0].ChangeMinutes(100);
-        filmArray[1].ChangeMinutes(120);
-    }
-    std::cout << "Массив уничтожен\n";
-    std::cout << "\nМассив динамических объектов:\n";
-    std::unique_ptr<Film> dynamicFilmArray[2];
-    dynamicFilmArray[0] = std::make_unique<Film>("Дюна", 155, 12);
-    dynamicFilmArray[1] = std::make_unique<Film>("Начало", 148, 12);
-    dynamicFilmArray[0]->PrintInfo();
-    dynamicFilmArray[1]->PrintInfo();
+    std::string name = "Popcorn";
+    std::cout << name.find("corn") << "\n";
+    std::cout << name.substr(3, 4) << "\n";
+    std::cout << name + " сладкий\n";
+    std::cout << (name == "Popcorn") << "\n";
+    std::cout << "Всего создано товаров: " << BaseProduct::GetCreatedCount() << "\n";
     return 0;
 }
