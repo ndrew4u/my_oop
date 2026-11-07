@@ -1,36 +1,45 @@
-﻿using System.Runtime.CompilerServices;
-using lab3_csahrp;
-Film film = new Film("Смешарики", 37, 12);
-film.PrintInfo();
-film.CheckAge(7);
-film.ChangeName("Лунтик");
-Console.WriteLine(film);
-Console.WriteLine("=== Демонстрация class ===");
-Film film1 = new Film("Смешарики", 37, 0);
-Film film2 = film1;
-film2.ChangeName("Лунтик");
-Console.WriteLine($"film1: {film1.Name}");
-Console.WriteLine($"film2: {film2.Name}");
-Console.WriteLine("\n=== Демонстрация struct ===");
-FilmStruct struct1 = new FilmStruct("Смешарики");
-FilmStruct struct2 = struct1;
-struct2.name = "Лунтик";
-Console.WriteLine($"struct1: {struct1.name}");
-Console.WriteLine($"struct2: {struct2.name}");
-Console.WriteLine("=== Проверка IDisposable ===");
-using (CinemaLog log = new CinemaLog("Кинотеатр Мир"))
+﻿using System;
+using static System.Console;
+class Program
 {
-    log.Write("Начался показ фильма Смешарики");
+    static void Main()
+    {
+        var popcorn = new Popcorn("Сладкий", 250);
+        var drink = new Drink("Кола", 150);
+        var combo = new Combo("Комбо 1", popcorn, drink, 50);
+        WriteLine("\n=== Полиморфизм ===");
+        BaseProduct[] products =
+        {
+            new Popcorn("Солёный", 200),
+            new Drink("Сок", 120),
+            combo.Clone()
+        };
+        foreach (BaseProduct product in products)
+        {
+            WriteLine(product.Describe());
+            WriteLine();
+        }
+        WriteLine("\n=== Копирование ===");
+        Combo shallow = combo.ShallowCopy();
+        Combo deep = combo.DeepCopy();
+        popcorn.SetPrice(300);
+        WriteLine("Оригинальное комбо: " + combo.GetPrice());
+        WriteLine("Поверхностная копия: " + shallow.GetPrice());
+        WriteLine("Глубокая копия: " + deep.GetPrice());
+        WriteLine("\n=== Конструкторы ===");
+        Popcorn ordinary = new Popcorn();
+        Popcorn copied = new Popcorn(ordinary);
+        WriteLine(copied.Describe());
+        WriteLine("\n=== Сравнение объектов ===");
+        Popcorn a = new Popcorn("Солёный", 200);
+        Popcorn b = new Popcorn("Солёный", 200);
+        WriteLine("Одинаковые по содержимому: " + a.Equals(b));
+        WriteLine("Хеши равны: " + (a.GetHashCode() == b.GetHashCode()));
+        WriteLine("\n=== Работа со строками ===");
+        string name = combo.GetName();
+        WriteLine("Поиск: " + name.Contains("Комбо"));
+        WriteLine("Подстрока: " + name.Substring(0, "Комбо".Length));
+        WriteLine("Сравнение: " + string.Compare(name, "Комбо 1"));
+        WriteLine("\nВсего создано объектов: " + BaseProduct.GetCreatedCount());
+    }
 }
-Console.WriteLine("=== Проверка сборщика мусора ===");
-WeakReference<Film> watcher = CreateTemporary();
-GC.Collect();
-GC.WaitForPendingFinalizers();
-Console.WriteLine(watcher.TryGetTarget(out _));
-[MethodImpl(MethodImplOptions.NoInlining)]
-static WeakReference<Film> CreateTemporary()
-{
-    Film temp = new Film("Смешарики", 90, 0);
-    return new WeakReference<Film>(temp);
-}
-Console.WriteLine("Программа завершена!");
