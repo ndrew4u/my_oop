@@ -1,89 +1,52 @@
-﻿#include "Cinema.hpp"
-#include "film.hpp"
-#include "hall.hpp"
-#include<iostream>
+﻿#include "Popcorn.hpp"
+#include "Drink.hpp"
+#include "Combo.hpp"
+#include <iostream>
+#include <memory>
 #include<locale.h>
-#include<memory>
 int main()
 {
     setlocale(LC_ALL, "RUS");
+    auto popcorn = std::make_shared<Popcorn>("Сладкий", 250);
+    auto drink = std::make_shared<Drink>("Кола", 150);
+    Combo combo("Комбо 1", popcorn, drink, 50);
+    std::cout << combo.Describe() << '\n';
+    std::unique_ptr<BaseProduct> products[3];
+    products[0] = std::make_unique<Popcorn>("Солёный", 200);
+    products[1] = std::make_unique<Drink>("Сок", 120);
+    products[2] = combo.Clone();
+    for (int i = 0; i < 3; i++)
     {
-        std::cout << "Передача владения:\n";
-        std::unique_ptr<Film> film = std::make_unique<Film>("Начало", 148, 12);
-        std::cout << "До передачи:\n";
-        film->PrintInfo();
-        std::unique_ptr<Film> film2 = std::move(film);
-        if (film == nullptr)
-        {
-            std::cout << "film пуст после передачи!\n";
-        }
-        if (film2 != nullptr)
-        {
-            std::cout << "film2 получил владение!\n";
-            film2->PrintInfo();
-        }
-        film2.reset();
+        std::cout << products[i]->Describe() << "\n\n";
     }
-    {
-        std::shared_ptr<Film> film = std::make_shared<Film>("Интерстеллар", 169, 12);
-        Cinema cinema("Кинотеатр", 1, 100);
-        cinema.SetFilmToHall(film);
-        std::cout << "\nДо удаления фильма:\n";
-        cinema.StartFilm();
-        cinema.StopFilm();
-        film.reset();
-        std::cout << "\nПосле удаления фильма:\n";
-        cinema.StartFilm();
-        cinema.PrintInfo();
-    }
-    std::cout << "\nУмный указатель unique_ptr:\n";
-    {
-        std::unique_ptr<Film> dynamicFilm = std::make_unique<Film>("Матрица", 136, 16);
-        dynamicFilm->PrintInfo();
-    }
-    std::cout << "Вышли из блока unique_ptr\n";
-    std::cout << "\nУмный указатель shared_ptr:\n";
-    std::shared_ptr<Film> film1 = std::make_shared<Film>("Дюна", 155, 12);
-    std::cout << "Владельцев: " << film1.use_count() << "\n";
-    {
-        std::shared_ptr<Film> film2 = film1;
-        std::cout << "Владельцев: " << film1.use_count() << "\n";
-        film2->PrintInfo();
-    }
-    std::cout << "Владельцев: " << film1.use_count() << "\n";
-    std::cout << "\nУмный указатель weak_ptr:\n";
-    std::weak_ptr<Film> ukaz;
-    {
-        std::shared_ptr<Film> film1 = std::make_shared<Film>("Начало", 148, 12);
-        ukaz = film1;
-        std::cout << "Владельцев: " << film1.use_count() << "\n";
-        if (std::shared_ptr<Film> temp = ukaz.lock())
-        {
-            std::cout << "Фильм существует!\n";
-            temp->PrintInfo();
-        }
-    }
-    std::cout << "Вышли из блока\n";
-    if (std::shared_ptr<Film> temp = ukaz.lock())
-    {
-        std::cout << "Фильм существует!\n";
-    }
-    else
-    {
-        std::cout << "Фильм уже уничтожен!\n";
-    }
-    std::cout << "\nДинамический массив объектов:\n";
-    {
-        std::unique_ptr<Film[]> filmArray = std::make_unique<Film[]>(2);
-        filmArray[0].ChangeMinutes(100);
-        filmArray[1].ChangeMinutes(120);
-    }
-    std::cout << "Массив уничтожен\n";
-    std::cout << "\nМассив динамических объектов:\n";
-    std::unique_ptr<Film> dynamicFilmArray[2];
-    dynamicFilmArray[0] = std::make_unique<Film>("Дюна", 155, 12);
-    dynamicFilmArray[1] = std::make_unique<Film>("Начало", 148, 12);
-    dynamicFilmArray[0]->PrintInfo();
-    dynamicFilmArray[1]->PrintInfo();
+    std::cout << "\n=== Проверка копирования ===\n";
+    auto shallow = popcorn;
+    Combo deep = combo;
+    popcorn->SetPrice(300);
+    std::cout << "Оригинальный попкорн: " << popcorn->GetPrice() << '\n';
+    std::cout << "Поверхностная копия: " << shallow->GetPrice() << '\n';
+    std::cout << "Оригинальное комбо: " << combo.GetPrice() << '\n';
+    std::cout << "Глубокая копия комбо: " << deep.GetPrice() << '\n';
+    std::cout << "\n=== Проверка присваивания ===\n";
+    Combo second("Второй набор", popcorn, drink, 20);
+    second = combo;
+    std::cout << second.Describe() << '\n';
+    second = second;
+    std::cout << "Самоприсваивание прошло\n";
+    std::cout << "\n=== Проверка конструкторов ===\n";
+    Popcorn ordinary;
+    Popcorn original("Карамельный", 180);
+    Popcorn copied(original);
+    Popcorn moved(std::move(original));
+    std::cout << copied.Describe() << '\n';
+    std::cout << moved.Describe() << '\n';
+    std::cout << "\n=== Проверка строк ===\n";
+    std::string name = combo.GetName();
+    std::cout << "Поиск: " << (name.find("Комбо") != std::string::npos) << '\n';
+    std::cout << "Подстрока: " << name.substr(0, 5) << '\n';
+    std::cout << "Сравнение: " << name.compare("Комбо 1") << '\n';
+    std::cout << "\n=== Проверка деструктора ===\n";
+    std::unique_ptr<BaseProduct> test = std::make_unique<Popcorn>("Тестовый", 100);
+    test.reset();
     return 0;
 }
