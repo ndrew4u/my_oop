@@ -1,9 +1,14 @@
 ﻿#pragma once
+#include "IStockItem.hpp"
 #include "BaseProduct.hpp"
-class Drink : public BaseProduct
+class Drink : public BaseProduct, public IStockItem
 {
+private:
+    int m_count;
 public:
-    Drink(std::string name, int price);
+    bool IsAvailable() const override;
+    void SellOne() override;
+    Drink(std::string name, int price, int count);
     Drink(const Drink& other);
     Drink(Drink&& other) noexcept;
     ~Drink() override;
