@@ -1,45 +1,54 @@
 ﻿using System;
-using static System.Console;
 class Program
 {
+    static void SellProduct(IStockItem item)
+    {
+        if (item.IsAvailable)
+        {
+            item.SellOne();
+            Console.WriteLine("Продажа успешна!");
+        }
+    }
+    static void TestSale(Popcorn popcorn)
+    {
+        try
+        {
+            popcorn.SellOne();
+            Console.WriteLine("Продажа успешна!");
+        }
+        catch (OutOfStockException error)
+        {
+            Console.WriteLine(error.Message);
+        }
+        finally
+        {
+            Console.WriteLine("Проверка завершена");
+        }
+    }
     static void Main()
     {
-        var popcorn = new Popcorn("Сладкий", 250);
-        var drink = new Drink("Кола", 150);
-        var combo = new Combo("Комбо 1", popcorn, drink, 50);
-        WriteLine("\n=== Полиморфизм ===");
-        BaseProduct[] products =
-        {
-            new Popcorn("Солёный", 200),
-            new Drink("Сок", 120),
-            combo.Clone()
-        };
-        foreach (BaseProduct product in products)
-        {
-            WriteLine(product.Describe());
-            WriteLine();
-        }
-        WriteLine("\n=== Копирование ===");
-        Combo shallow = combo.ShallowCopy();
-        Combo deep = combo.DeepCopy();
-        popcorn.SetPrice(300);
-        WriteLine("Оригинальное комбо: " + combo.GetPrice());
-        WriteLine("Поверхностная копия: " + shallow.GetPrice());
-        WriteLine("Глубокая копия: " + deep.GetPrice());
-        WriteLine("\n=== Конструкторы ===");
-        Popcorn ordinary = new Popcorn();
-        Popcorn copied = new Popcorn(ordinary);
-        WriteLine(copied.Describe());
-        WriteLine("\n=== Сравнение объектов ===");
-        Popcorn a = new Popcorn("Солёный", 200);
-        Popcorn b = new Popcorn("Солёный", 200);
-        WriteLine("Одинаковые по содержимому: " + a.Equals(b));
-        WriteLine("Хеши равны: " + (a.GetHashCode() == b.GetHashCode()));
-        WriteLine("\n=== Работа со строками ===");
-        string name = combo.GetName();
-        WriteLine("Поиск: " + name.Contains("Комбо"));
-        WriteLine("Подстрока: " + name.Substring(0, "Комбо".Length));
-        WriteLine("Сравнение: " + string.Compare(name, "Комбо 1"));
-        WriteLine("\nВсего создано объектов: " + BaseProduct.GetCreatedCount());
+        Popcorn popcorn = new Popcorn("Сырный", 400, 3);
+        Drink drink = new Drink("Кола", 200, 2);
+        SellProduct(popcorn);
+        SellProduct(drink);
+        BaseProduct product = popcorn;
+        Console.WriteLine(product.GetName());
+        Console.WriteLine(popcorn.GetName());
+        Console.WriteLine(product.Describe());
+        if (product is IStockItem stock)
+            Console.WriteLine(stock.IsAvailable);
+        BaseProduct combo = new Combo("Комбо", popcorn, drink, 10);
+        IStockItem stockCombo = combo as IStockItem;
+        Console.WriteLine(stockCombo == null);
+        CashDesk cashDesk = new CashDesk(new StandardPricePolicy());
+        Console.WriteLine(cashDesk.CalculatePrice(400));
+        cashDesk.SetPolicy(new DiscountPricePolicy());
+        Console.WriteLine(cashDesk.CalculatePrice(400));
+        Popcorn[] goods = { new Popcorn("Сырный", 400), new Popcorn("Карамельный", 350)};
+        Array.Sort(goods);
+        foreach (Popcorn item in goods)
+            Console.WriteLine(item.GetName());
+        TestSale(new Popcorn("Пустой", 400, 0));
+        TestSale(new Popcorn("Сладкий", 300, 1));
     }
 }
