@@ -1,52 +1,89 @@
-﻿#include "Popcorn.hpp"
+﻿#include <iostream>
+#include <memory>
+#include <clocale>
+#include <exception>
+#include "BaseProduct.hpp"
+#include "Popcorn.hpp"
 #include "Drink.hpp"
 #include "Combo.hpp"
-#include <iostream>
-#include <memory>
-#include<locale.h>
+#include "IStockItem.hpp"
+#include "IPricePolicy.hpp"
+#include "StandardPricePolicy.hpp"
+#include "DiscountPricePolicy.hpp"
+#include "CashDesk.hpp"
+#include "OutOfStockError.hpp"
+void SellProduct(IStockItem& item)
+{
+    if (item.IsAvailable())
+    {
+        item.SellOne();
+        std::cout << "Успешная продажа!\n";
+    }
+    else
+    {
+        std::cout << "Товара нет!\n";
+    }
+}
+void TrySell(BaseProduct& item)
+{
+    if (auto* stock = dynamic_cast<IStockItem*>(&item))
+    {
+        std::cout << "Товар поддерживает IStockItem\n";
+        stock->SellOne();
+    }
+    else
+    {
+        std::cout << item.GetName()
+            << ": интерфейс IStockItem не поддерживается\n";
+    }
+}
 int main()
 {
     setlocale(LC_ALL, "RUS");
-    auto popcorn = std::make_shared<Popcorn>("Сладкий", 250);
-    auto drink = std::make_shared<Drink>("Кола", 150);
-    Combo combo("Комбо 1", popcorn, drink, 50);
-    std::cout << combo.Describe() << '\n';
-    std::unique_ptr<BaseProduct> products[3];
-    products[0] = std::make_unique<Popcorn>("Солёный", 200);
-    products[1] = std::make_unique<Drink>("Сок", 120);
-    products[2] = combo.Clone();
-    for (int i = 0; i < 3; i++)
+    Popcorn popcorn1("Сырный", 400, 5);
+    Drink drink1("Кола", 200, 5);
+    SellProduct(popcorn1);
+    SellProduct(drink1);
+    BaseProduct& item = popcorn1;
+    std::cout << "Через BaseProduct: " << item.GetName() << "\n";
+    std::cout << "Через Popcorn: " << popcorn1.GetName() << "\n";
+    std::cout << item.Describe() << "\n";
+    TrySell(popcorn1);
+    auto comboPopcorn =std::make_shared<Popcorn>("Карамельный", 350, 5);
+    auto comboDrink = std::make_shared<Drink>("Сок", 150, 5);
+    Combo combo("Комбо-набор", comboPopcorn, comboDrink, 10);
+    TrySell(combo);
+    CashDesk cashDesk(std::make_unique<StandardPricePolicy>());
+    std::cout << "Обычная цена: " << cashDesk.CalculatePrice(400) << "\n";
+    cashDesk.SetPolicy(std::make_unique<DiscountPricePolicy>());
+    std::cout << "Цена со скидкой: " << cashDesk.CalculatePrice(400) << "\n";
+    Popcorn popcornEmpty("Пустой", 400, 0);
+    Popcorn popcornAvailable("Сладкий", 300, 5);
+    try
     {
-        std::cout << products[i]->Describe() << "\n\n";
+        popcornEmpty.SellOne();
+        std::cout << "Продажа успешна!\n";
     }
-    std::cout << "\n=== Проверка копирования ===\n";
-    auto shallow = popcorn;
-    Combo deep = combo;
-    popcorn->SetPrice(300);
-    std::cout << "Оригинальный попкорн: " << popcorn->GetPrice() << '\n';
-    std::cout << "Поверхностная копия: " << shallow->GetPrice() << '\n';
-    std::cout << "Оригинальное комбо: " << combo.GetPrice() << '\n';
-    std::cout << "Глубокая копия комбо: " << deep.GetPrice() << '\n';
-    std::cout << "\n=== Проверка присваивания ===\n";
-    Combo second("Второй набор", popcorn, drink, 20);
-    second = combo;
-    std::cout << second.Describe() << '\n';
-    second = second;
-    std::cout << "Самоприсваивание прошло\n";
-    std::cout << "\n=== Проверка конструкторов ===\n";
-    Popcorn ordinary;
-    Popcorn original("Карамельный", 180);
-    Popcorn copied(original);
-    Popcorn moved(std::move(original));
-    std::cout << copied.Describe() << '\n';
-    std::cout << moved.Describe() << '\n';
-    std::cout << "\n=== Проверка строк ===\n";
-    std::string name = combo.GetName();
-    std::cout << "Поиск: " << (name.find("Комбо") != std::string::npos) << '\n';
-    std::cout << "Подстрока: " << name.substr(0, 5) << '\n';
-    std::cout << "Сравнение: " << name.compare("Комбо 1") << '\n';
-    std::cout << "\n=== Проверка деструктора ===\n";
-    std::unique_ptr<BaseProduct> test = std::make_unique<Popcorn>("Тестовый", 100);
-    test.reset();
+    catch (const OutOfStockError& error)
+    {
+        std::cout << error.what() << "\n";
+    }
+    catch (const std::exception& error)
+    {
+        std::cout << "Ошибка: " << error.what() << "\n";
+    }
+    try
+    {
+        popcornAvailable.SellOne();
+        std::cout << "Продажа успешна!\n";
+    }
+    catch (const OutOfStockError& error)
+    {
+        std::cout << error.what() << "\n";
+    }
+    catch (const std::exception& error)
+    {
+        std::cout << "Ошибка: " << error.what() << "\n";
+    }
     return 0;
 }

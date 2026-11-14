@@ -1,18 +1,18 @@
 ﻿#include "Drink.hpp"
 #include <iostream>
 #include <utility>
-Drink::Drink(std::string name, int price)
-    : BaseProduct(name, price)
+Drink::Drink(std::string name, int price, int count)
+    : BaseProduct(name, price), m_count{count}
 {
     std::cout << "Конструктор Drink\n";
 }
 Drink::Drink(const Drink& other)
-    : BaseProduct(other)
+    : BaseProduct(other), m_count{other.m_count}
 {
     std::cout << "Конструктор копирования Drink\n";
 }
 Drink::Drink(Drink&& other) noexcept
-    : BaseProduct(std::move(other))
+    : BaseProduct(std::move(other)), m_count{other.m_count}
 {
     std::cout << "Конструктор перемещения Drink\n";
 }
@@ -31,4 +31,18 @@ std::string Drink::Describe() const
 std::unique_ptr<BaseProduct> Drink::Clone() const
 {
     return std::make_unique<Drink>(*this);
+}
+bool Drink::IsAvailable() const
+{
+    if (m_count > 0) { return true; }
+    else return false;
+}
+void Drink::SellOne()
+{
+    if (m_count > 0)
+    {
+        --m_count;
+        std::cout << "Успешная продажа!\n";
+    }
+    else std::cout << "Напитков нет!\n";
 }
