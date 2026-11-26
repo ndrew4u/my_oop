@@ -22,3 +22,4 @@ public:
 	virtual std::string Describe() const;
 	virtual std::unique_ptr<BaseProduct> Clone() const = 0;
 };
+std::ostream& operator<<(std::ostream& out, const BaseProduct& other);

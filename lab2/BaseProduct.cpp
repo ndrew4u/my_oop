@@ -39,4 +39,8 @@ std::string BaseProduct::Describe() const
 {
 	return "Название: " + m_name + "\nЦена: " + std::to_string(m_price);
 }
+std::ostream& operator<<(std::ostream& out, const BaseProduct& other)
+{
+	return out << other.Describe();
+}
 

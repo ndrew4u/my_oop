@@ -17,4 +17,9 @@ public:
 	std::unique_ptr<BaseProduct> Clone() const override;
 	std::string Describe() const override;
 	std::string GetName() const;
+	bool operator==(const Popcorn& other) const;
+	bool operator<(const Popcorn& other) const;
+	Popcorn& operator+=(const Popcorn& other);
+	Popcorn operator+(const Popcorn& other) const;
+	friend std::ostream& operator<<(std::ostream& out, const Popcorn& other);
 };
