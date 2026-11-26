@@ -6,6 +6,7 @@ private:
 	std::unique_ptr<IPricePolicy> m_policy;
 public:
 	int CalculatePrice(int price) const;
+	int CalculatePrice(int price, int count) const;
 	CashDesk(std::unique_ptr<IPricePolicy> policy);
 	void SetPolicy(std::unique_ptr<IPricePolicy> policy);
 };

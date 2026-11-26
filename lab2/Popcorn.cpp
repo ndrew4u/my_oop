@@ -56,3 +56,35 @@ void Popcorn::SellOne()
 	}
 	else throw OutOfStockError{ GetName() };;
 }
+bool Popcorn::operator==(const Popcorn& other) const
+{
+	return m_name == other.m_name && m_price == other.m_price;
+}
+bool Popcorn::operator<(const Popcorn& other) const
+{
+	if (m_price == other.m_price)
+		return m_name < other.m_name;
+	return m_price < other.m_price;
+}
+Popcorn& Popcorn::operator+=(const Popcorn& other)
+{
+	if (m_name == other.m_name && m_price == other.m_price)
+	{
+		m_count += other.m_count;
+	}
+	else
+	{
+		std::cout << "Невозможно объединить попкорн с разными именами или ценами.\n";
+	}
+	return *this;
+}
+Popcorn Popcorn::operator+(const Popcorn& other) const
+{
+	Popcorn result = *this;
+	result += other;
+	return result;
+}
+std::ostream& operator<<(std::ostream& out, const Popcorn& other)
+{
+	return out << other.m_count;
+}
