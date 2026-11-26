@@ -1,54 +1,37 @@
 ﻿using System;
+using System.Numerics;
 class Program
 {
-    static void SellProduct(IStockItem item)
+    static T CalculateTotalPrice<T>(T firstPrice, T secondPrice) where T : INumber<T>
     {
-        if (item.IsAvailable)
-        {
-            item.SellOne();
-            Console.WriteLine("Продажа успешна!");
-        }
-    }
-    static void TestSale(Popcorn popcorn)
-    {
-        try
-        {
-            popcorn.SellOne();
-            Console.WriteLine("Продажа успешна!");
-        }
-        catch (OutOfStockException error)
-        {
-            Console.WriteLine(error.Message);
-        }
-        finally
-        {
-            Console.WriteLine("Проверка завершена");
-        }
+        return firstPrice + secondPrice;
     }
     static void Main()
     {
-        Popcorn popcorn = new Popcorn("Сырный", 400, 3);
-        Drink drink = new Drink("Кола", 200, 2);
-        SellProduct(popcorn);
-        SellProduct(drink);
-        BaseProduct product = popcorn;
-        Console.WriteLine(product.GetName());
-        Console.WriteLine(popcorn.GetName());
-        Console.WriteLine(product.Describe());
-        if (product is IStockItem stock)
-            Console.WriteLine(stock.IsAvailable);
-        BaseProduct combo = new Combo("Комбо", popcorn, drink, 10);
-        IStockItem stockCombo = combo as IStockItem;
-        Console.WriteLine(stockCombo == null);
         CashDesk cashDesk = new CashDesk(new StandardPricePolicy());
-        Console.WriteLine(cashDesk.CalculatePrice(400));
+        Console.WriteLine(cashDesk.CalculatePrice(100));
+        Console.WriteLine(cashDesk.CalculatePrice(100, 2));
         cashDesk.SetPolicy(new DiscountPricePolicy());
-        Console.WriteLine(cashDesk.CalculatePrice(400));
-        Popcorn[] goods = { new Popcorn("Сырный", 400), new Popcorn("Карамельный", 350)};
-        Array.Sort(goods);
-        foreach (Popcorn item in goods)
-            Console.WriteLine(item.GetName());
-        TestSale(new Popcorn("Пустой", 400, 0));
-        TestSale(new Popcorn("Сладкий", 300, 1));
+        Console.WriteLine(cashDesk.CalculatePrice(100));
+        Console.WriteLine(cashDesk.CalculatePrice(100, 2));
+        Popcorn p1 = new Popcorn("Сырный", 150, 5);
+        Popcorn p2 = new Popcorn("Сырный", 150, 3);
+        Console.WriteLine(p1 == p2);
+        Console.WriteLine(p1 != p2);
+        Popcorn p3 = p1 + p2;
+        Console.WriteLine(p3.StockCount);
+        p1 += p2;
+        Console.WriteLine(p1.StockCount);
+        Console.WriteLine(((BaseProduct)p1).ToString());
+        Console.WriteLine(CalculateTotalPrice(150, 100));
+        Console.WriteLine(CalculateTotalPrice(150.5, 100.75));
+        Drink d1 = new Drink("Вода", 100, 10);
+        Stock<Popcorn> popcornStock = new Stock<Popcorn>(p1);
+        Stock<Drink> drinkStock = new Stock<Drink>(d1);
+        Console.WriteLine(popcornStock.IsAvailable());
+        popcornStock.SellOne();
+        popcornStock.PrintTogether(d1);
+        drinkStock.SellOne();
+        drinkStock.PrintTogether(p1);
     }
 }

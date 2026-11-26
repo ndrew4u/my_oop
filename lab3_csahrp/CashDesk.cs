@@ -14,4 +14,8 @@ public class CashDesk
     {
         return m_policy.CalculatePrice(price);
     }
+    public int CalculatePrice(int price, int count)
+    {
+        return CalculatePrice(price) * count;
+    }
 }
