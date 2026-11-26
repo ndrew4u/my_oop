@@ -1,8 +1,8 @@
 ﻿using System;
+
 public sealed class Popcorn : BaseProduct, IStockItem, IComparable<Popcorn>
 {
     private int m_count = 10;
-
     public Popcorn(string name, int price)
         : base(name, price)
     {
@@ -59,5 +59,32 @@ public sealed class Popcorn : BaseProduct, IStockItem, IComparable<Popcorn>
     {
         if (other is null) return 1;
         return string.Compare(m_name, other.m_name, StringComparison.CurrentCulture);
+    }
+    public static bool operator ==(Popcorn? left, Popcorn? right)
+    {
+        return object.Equals(left, right);
+    }
+    public static bool operator !=(Popcorn? left, Popcorn? right)
+    {
+        return !(left == right);
+    }
+    public static Popcorn operator +(Popcorn left, Popcorn right)
+    {
+        Popcorn result = new Popcorn(left);
+
+        if (left.m_name == right.m_name && left.m_price == right.m_price)
+        {
+            result.m_count += right.m_count;
+        }
+        else
+        {
+            Console.WriteLine("Невозможно объединить попкорн с разными именами или ценами.");
+        }
+
+        return result;
+    }
+    internal int StockCount
+    {
+        get { return m_count; }
     }
 }

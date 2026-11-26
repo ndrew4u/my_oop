@@ -4,6 +4,7 @@ public abstract class BaseProduct
     protected string m_name;
     protected int m_price;
     private static int s_createdCount = 0;
+
     protected BaseProduct(string name, int price)
     {
         this.m_name = name;
@@ -37,4 +38,8 @@ public abstract class BaseProduct
             + "\nЦена: " + GetPrice();
     }
     public abstract BaseProduct Clone();
+    public override string ToString()
+    {
+        return Describe();
+    }
 }
